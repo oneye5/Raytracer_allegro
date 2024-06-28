@@ -7,6 +7,7 @@ class Renderer
 {
 private:
 	vec3<float> calculate_ray_vector(const unsigned short& screen_x, const unsigned short& screen_y);
+	Scene scene;
 public:
 	unsigned short	SCREEN_W, SCREEN_H;
 	Camera* camera;
@@ -30,6 +31,9 @@ public:
 		vec2<unsigned char> fov_xy(DEG_TO_RAD(90), DEG_TO_RAD(90));
 
 		camera = new Camera(pos,rot,fov_xy);
+
+		scene.geometry.push_back(Mesh::get_sample_mesh());
+		scene.geometry.at(0).sort_tris_by_depth(camera->POSITION);
 	}
 	~Renderer()
 	{

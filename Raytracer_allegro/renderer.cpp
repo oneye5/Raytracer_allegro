@@ -9,7 +9,7 @@ void Renderer::render_frame()
 		for (unsigned short x = 0; x < SCREEN_W; x++)
 		{
 			auto angle = calculate_ray_vector(x, y);
-			//std::cout << "screen pos " << x << " " << y << " vector: " << angle.x << " " << angle.y << angle.z << std::endl;
+			auto color = compute_color(camera->POSITION,angle);
 		}
 	}
 	std::cout << "done render";
@@ -17,6 +17,8 @@ void Renderer::render_frame()
 
 Color<COLOR_DATA_TYPE> Renderer::compute_color(const vec3<float>& position,const vec3<float> dir_vector)
 {
+
+
 	Color<COLOR_DATA_TYPE> c(1.0f, 2.0f, 3.0f);
 	return c;
 }
@@ -32,8 +34,8 @@ vec3<float> Renderer::calculate_ray_vector(const unsigned short &screen_x, const
 	float fov_step_y = (float)camera->FOV.y / (float)SCREEN_H;
 
 	//calculate the angle from screenspace coords
-	rad_pitch = fov_step_y * (float)screen_y;
-	rad_yaw = fov_step_x * (float)screen_x;
+	rad_pitch = fov_step_y * ((float)screen_y - ((float)SCREEN_H / 2.0f));
+	rad_yaw = fov_step_x * ((float)screen_x - ((float)SCREEN_W / 2.0f));
 	
 	rad_pitch += camera->PITCH_YAW.x;
 	rad_yaw += camera->PITCH_YAW.y;
