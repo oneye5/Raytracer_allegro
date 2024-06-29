@@ -2,6 +2,7 @@
 #include <cmath>
 #include <vector>
 #include <algorithm>
+#include <iostream>
 /*
 	this file contains all smaller helper data structures and functions relating to
 	the renderer that dont deserve to have their own file.
@@ -257,9 +258,9 @@ class ray_info
 {
 public:
 	bool hit;
-	hit_info* hit_result;
+	hit_info<VEC_TYPE>* hit_result;
 
-	ray_info(bool t, hit_info* hitInfo)
+	ray_info(bool t, hit_info<VEC_TYPE>* hitInfo)
 	{
 		hit = t; 
 		hit_result = hitInfo;
@@ -318,7 +319,7 @@ ray_info<VEC_TYPE> ray_intersect_tri(const vec3<float>& ray_origin, const vec3<f
 	);
 
 	return ray_info
-	{ 
+	{
 		true,
 		new hit_info
 		{
@@ -329,6 +330,6 @@ ray_info<VEC_TYPE> ray_intersect_tri(const vec3<float>& ray_origin, const vec3<f
 				intersect_u,
 				intersect_v
 			}
-		} 
-	}
+		}
+	};
 }
