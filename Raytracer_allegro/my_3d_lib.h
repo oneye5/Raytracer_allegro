@@ -8,6 +8,9 @@
 	the renderer that dont deserve to have their own file.
 */
 
+
+
+
 template<class T>
 class Color
 {
@@ -41,54 +44,54 @@ public:
 	}
 };
 
-template<class T>
+template<class VERTEX_TYPE>
 class vec3
 {
 public:
-	T x = 0;
-	T y = 0;
-	T z = 0;
+	VERTEX_TYPE x = 0;
+	VERTEX_TYPE y = 0;
+	VERTEX_TYPE z = 0;
 	vec3() {}
-	vec3(T X, T Y,T Z)
+	vec3(VERTEX_TYPE X, VERTEX_TYPE Y, VERTEX_TYPE Z)
 	{
 		x = X;
 		y = Y;
 		z = Z;
 	}
-	vec3(T XYZ_ASSIGNMENT)
+	vec3(VERTEX_TYPE XYZ_ASSIGNMENT)
 	{
 		x = XYZ_ASSIGNMENT;
 		y = XYZ_ASSIGNMENT;
 		z = XYZ_ASSIGNMENT;
 	}
 
-	static inline vec3<T> subtract(const vec3<T>& v1, const vec3<T>& v2)
+	static inline vec3<VERTEX_TYPE> subtract(const vec3<VERTEX_TYPE>& v1, const vec3<VERTEX_TYPE>& v2)
 	{
-		return vec3<T>{v1.x - v2.x, v1.y - v2.y, v1.z - v2.z};
+		return vec3<VERTEX_TYPE>{v1.x - v2.x, v1.y - v2.y, v1.z - v2.z};
 	}
-	static inline vec3<T> add(const vec3<T>& v1, const vec3<T>& v2)
+	static inline vec3<VERTEX_TYPE> add(const vec3<VERTEX_TYPE>& v1, const vec3<VERTEX_TYPE>& v2)
 	{
-		return vec3<T>{v1.x + v2.x, v1.y + v2.y, v1.z + v2.z};
+		return vec3<VERTEX_TYPE>{v1.x + v2.x, v1.y + v2.y, v1.z + v2.z};
 	}
-	static inline vec3<T> cross_product(const vec3<T>& v1, const vec3<T>& v2)
+	static inline vec3<VERTEX_TYPE> cross_product(const vec3<VERTEX_TYPE>& v1, const vec3<VERTEX_TYPE>& v2)
 	{
-		return vec3<T>
+		return vec3<VERTEX_TYPE>
 		{
 			v1.y* v2.z - v1.z * v2.y,
 			v1.z* v2.x - v1.x * v2.z,
 			v1.x* v2.y - v1.y * v2.x
 		};
 	}
-	static inline T dot_product(const vec3<T>& v1, const vec3<T>& v2)
+	static inline VERTEX_TYPE dot_product(const vec3<VERTEX_TYPE>& v1, const vec3<VERTEX_TYPE>& v2)
 	{
 		return
 			v1.x * v2.x +
 			v1.y * v2.y +
 			v1.x * v2.z;
 	}
-	static inline T multiply(const vec3<T>& v1, const T& f)
+	static inline VERTEX_TYPE multiply(const vec3<VERTEX_TYPE>& v1, const VERTEX_TYPE& f)
 	{
-		return vec3<T>
+		return vec3<VERTEX_TYPE>
 		{
 			v1.x* f,
 			v1.y* f,
@@ -135,10 +138,15 @@ public:
 		FOV = fov_xy;
 	}
 };
+
+template<class VERTEX_TYPE,class NORMAL_TYPE, class UV_TYPE>
 class Mesh 
 {
 public:
-	Mesh(std::vector<vec3<float>> vertex_buffer_,std::vector<vec2<float>> uv_buffer_,std::vector<vec3<float>> normal_buffer_,std::vector<unsigned int> index_buffer_)
+	Mesh(std::vector<vec3<VERTEX_TYPE>> vertex_buffer_,
+		 std::vector<vec3<NORMAL_TYPE>> normal_buffer_, 
+		 std::vector<vec2<UV_TYPE>> uv_buffer_, 
+		 std::vector<unsigned int> index_buffer_)
 	{
 		vertex_buffer = vertex_buffer_;
 		uv_buffer = uv_buffer_;
@@ -147,46 +155,47 @@ public:
 	}
 	Mesh() {}
 
-	std::vector<vec3<float>> vertex_buffer;
-	std::vector<vec2<float>> uv_buffer;
-	std::vector<vec3<float>> normal_buffer;
-	std::vector<unsigned int> index_buffer; //in the format of [[vi,uv,n],[vi,uv,n],[vi,uv,n]]
+	std::vector<vec3<VERTEX_TYPE>> vertex_buffer;
+	std::vector<vec3<NORMAL_TYPE>> normal_buffer;
+	std::vector<vec2<UV_TYPE>> uv_buffer;
 
-	static Mesh get_sample_mesh() 
+	std::vector<unsigned int> index_buffer; //in the format of [[vi,n,uv],[vi,n,uv],[vi,n,uv]]
+
+	static Mesh get_sample_mesh()
 	{
-		std::vector<vec3<float>> vertex_buffer = {
-	        vec3<float>(-0.5f, -0.5f, 0.0f), // Bottom-left
-	        vec3<float>(0.5f, -0.5f, 0.0f),  // Bottom-right
-	        vec3<float>(0.5f, 0.5f, 0.0f),   // Top-right
-	        vec3<float>(-0.5f, 0.5f, 0.0f)   // Top-left
-	    };
-		std::vector<vec2<float>> uv_buffer = {
-	        vec2<float>(0.0f, 0.0f), // Bottom-left
-	        vec2<float>(1.0f, 0.0f), // Bottom-right
-	        vec2<float>(1.0f, 1.0f), // Top-right
-	        vec2<float>(0.0f, 1.0f)  // Top-left
-	    };
-		std::vector<vec3<float>> normal_buffer = {
-	        vec3<float>(0.0f, 0.0f, 1.0f), // Bottom-left
-	        vec3<float>(0.0f, 0.0f, 1.0f), // Bottom-right
-	        vec3<float>(0.0f, 0.0f, 1.0f), // Top-right
-	        vec3<float>(0.0f, 0.0f, 1.0f)  // Top-left
-	    };
-	    // Define indices for two triangles that make up the square
-	    // Each group of three values represents vertex_index, uv_index, normal_index
-		std::vector<unsigned int> index_buffer = {
-	        0, 0, 0,  // First triangle: Bottom-left
-	        1, 1, 1,  // First triangle: Bottom-right
-	        2, 2, 2,  // First triangle: Top-right
-	
-	        2, 2, 2,  // Second triangle: Top-righte
-	        3, 3, 3,  // Second triangle: Top-left
-	        0, 0, 0   // Second triangle: Bottom-left
-	    };
-	
+		std::vector<vec3<VERTEX_TYPE>> vertex_buffer = {
+			vec3<VERTEX_TYPE>(-0.5, -0.5, 0.0), // Bottom-left
+			vec3<VERTEX_TYPE>(0.5, -0.5, 0.0),  // Bottom-right
+			vec3<VERTEX_TYPE>(0.5, 0.5, 0.0),   // Top-right
+			vec3<VERTEX_TYPE>(-0.5, 0.5, 0.0)   // Top-left
+		};
 
-		return Mesh(vertex_buffer,uv_buffer,normal_buffer,index_buffer);
+		std::vector<vec3<NORMAL_TYPE>> normal_buffer = {
+			vec3<NORMAL_TYPE>(0.0, 0.0, 1.0), // Bottom-left
+			vec3<NORMAL_TYPE>(0.0, 0.0, 1.0), // Bottom-right
+			vec3<NORMAL_TYPE>(0.0, 0.0, 1.0), // Top-right
+			vec3<NORMAL_TYPE>(0.0, 0.0, 1.0)  // Top-left
+		};
+
+		std::vector<vec2<UV_TYPE>> uv_buffer = {
+			vec2<UV_TYPE>(0.0, 0.0), // Bottom-left
+			vec2<UV_TYPE>(1.0, 0.0), // Bottom-right
+			vec2<UV_TYPE>(1.0, 1.0), // Top-right
+			vec2<UV_TYPE>(0.0, 1.0)  // Top-left
+		};
+
+		std::vector<unsigned int> index_buffer = {
+			0, 0, 0, // First triangle: Bottom-left
+			1, 1, 1, // First triangle: Bottom-right
+			2, 2, 2, // First triangle: Top-right
+			2, 2, 2, // Second triangle: Top-right
+			3, 3, 3,  // Second triangle: Top-left
+			3, 3, 3
+		};
+
+		return Mesh{ vertex_buffer, normal_buffer, uv_buffer, index_buffer };
 	}
+
 	void sort_tris_by_depth(const vec3<float>& camera_position)
 	{
 		std::vector<std::pair<float,std::vector<unsigned int>>> tris;
@@ -227,40 +236,41 @@ public:
 	}
 
 };
+template<class VERTEX_TYPE, class NORMAL_TYPE, class UV_TYPE>
 class Scene
 {
 public:
-	std::vector<Mesh> geometry;
+	std::vector<Mesh<VERTEX_TYPE, NORMAL_TYPE, UV_TYPE>> geometry;
 };
 
 /*
 * used for wrapping triangle information, to allow for flexibility in geometry implementation / format
 */
-template <class VEC_TYPE, class UV_TYPE, class NORM_TYPE> 
+template <class VERTEX_TYPE, class NORMAL_TYPE, class UV_TYPE>
 struct triangle_info
 {
-	vec3<VEC_TYPE>* vertices[3];
-	vec2<UV_TYPE>*	uv[3];
-	vec3<NORM_TYPE>* normals[3];
+	vec3<VERTEX_TYPE>** vertices; // array of size 3 containing pointers to the actual values
+	vec3<NORMAL_TYPE>** normals;
+	vec2<UV_TYPE>**		uv;
 };
 
 // used in ray_info, for avoiding un-needed memory allocation however we must be careful to avoid memory leaks
-template <class VEC_TYPE>
+template <class VERTEX_TYPE>
 struct hit_info
 {
-	VEC_TYPE DISTANCE;
-	vec3<VEC_TYPE> HIT_POINT_WORLDSPACE;
-	vec2<VEC_TYPE> HIT_POINT_UVSPACE;
+	VERTEX_TYPE DISTANCE;
+	vec3<VERTEX_TYPE> HIT_POINT_WORLDSPACE;
+	vec2<VERTEX_TYPE> HIT_POINT_UVSPACE;
 };
 // returned by ray_intersect_tri()
-template <class VEC_TYPE>
+template <class VERTEX_TYPE>
 class ray_info
 {
 public:
 	bool hit;
-	hit_info<VEC_TYPE>* hit_result;
+	hit_info<VERTEX_TYPE>* hit_result;
 
-	ray_info(bool t, hit_info<VEC_TYPE>* hitInfo)
+	ray_info(bool t, hit_info<VERTEX_TYPE>* hitInfo)
 	{
 		hit = t; 
 		hit_result = hitInfo;
@@ -271,6 +281,7 @@ public:
 			std::cout << "\nin ray_info(bool f), this constructor should only be called when the result is false, because hit information about the hit must be provided otherwise\n";
 		hit = f;
 	}
+	ray_info() {}
 	~ray_info()
 	{
 		if (hit_result != nullptr)
@@ -279,28 +290,28 @@ public:
 };
 
 //checks if a ray intersects with a triangle. (uses the moller trumbore algorithm)
-template <class VEC_TYPE, class UV_TYPE, class NORM_TYPE>
-ray_info<VEC_TYPE> ray_intersect_tri(const vec3<float>& ray_origin, const vec3<float>& ray_dir, const triangle_info<VEC_TYPE, UV_TYPE, NORM_TYPE>& tri)
+template <class VERTEX_TYPE, class NORMAL_TYPE, class UV_TYPE>
+ray_info<VERTEX_TYPE> ray_intersect_tri(const vec3<float>& ray_origin, const vec3<float>& ray_dir, const triangle_info<VERTEX_TYPE, UV_TYPE, NORMAL_TYPE>& tri)
 {
 	const float moe = 0.000001;
 
-	vec3<VEC_TYPE> edge_1 = vec3<VEC_TYPE>::subtract(tri.vertices[1], tri.vertices[0]);
-	vec3<VEC_TYPE> edge_2 = vec3<VEC_TYPE>::subtract(tri.vertices[2], tri.vertices[0]);
+	vec3<VERTEX_TYPE> edge_1 = vec3<VERTEX_TYPE>::subtract(tri.vertices[1], tri.vertices[0]);
+	vec3<VERTEX_TYPE> edge_2 = vec3<VERTEX_TYPE>::subtract(tri.vertices[2], tri.vertices[0]);
 
-	vec3<VEC_TYPE> dir_edge_cross = vec3<VEC_TYPE>::cross_product(ray_dir, edge_2);
-	VEC_TYPE cross_edge_dot = vec3<VEC_TYPE>::dot_product(edge_1, dir_edge_cross);
+	vec3<VERTEX_TYPE> dir_edge_cross = vec3<VERTEX_TYPE>::cross_product(ray_dir, edge_2);
+	VERTEX_TYPE cross_edge_dot = vec3<VERTEX_TYPE>::dot_product(edge_1, dir_edge_cross);
 
 	if (cross_edge_dot > -moe && cross_edge_dot < moe) //ray parallel to triangle plane, it will never intersect so we can return early
 		return ray_info{ false };
 
-	VEC_TYPE inverse_cross_dot = 1.0 / cross_edge_dot;
-	vec3<VEC_TYPE> origin_tri_dif = vec3<VEC_TYPE>::subtract(ray_origin, tri.vertices[0]);
-	VEC_TYPE pos_dif_cross = vec3<VEC_TYPE>::cross_product(origin_tri_dif, edge_1);
+	VERTEX_TYPE inverse_cross_dot = 1.0 / cross_edge_dot;
+	vec3<VERTEX_TYPE> origin_tri_dif = vec3<VERTEX_TYPE>::subtract(ray_origin, tri.vertices[0]);
+	VERTEX_TYPE pos_dif_cross = vec3<VERTEX_TYPE>::cross_product(origin_tri_dif, edge_1);
 
 
-	VEC_TYPE intersect_u = inverse_cross_dot * vec3<VEC_TYPE>::dot_product(origin_tri_dif, dir_edge_cross);
-	VEC_TYPE intersect_v = inverse_cross_dot * vec3<VEC_TYPE>::dot_product(ray_dir, pos_dif_cross);
-	VEC_TYPE dist_traveled = inverse_cross_dot * vec3<VEC_TYPE>::dot_product(edge_2, pos_dif_cross);
+	VERTEX_TYPE intersect_u = inverse_cross_dot * vec3<VERTEX_TYPE>::dot_product(origin_tri_dif, dir_edge_cross);
+	VERTEX_TYPE intersect_v = inverse_cross_dot * vec3<VERTEX_TYPE>::dot_product(ray_dir, pos_dif_cross);
+	VERTEX_TYPE dist_traveled = inverse_cross_dot * vec3<VERTEX_TYPE>::dot_product(edge_2, pos_dif_cross);
 
 	if (intersect_u < 0.0 || intersect_u > 1.0)//--------------- point lies outside the bounds along the edge of the first fertex to the seccond, so we can return early
 		return ray_info{ false };
@@ -312,9 +323,9 @@ ray_info<VEC_TYPE> ray_intersect_tri(const vec3<float>& ray_origin, const vec3<f
 		return ray_info{ false };
 
 	// we have a confirmed hit, now lets calculate where exactly this happened in world space
-	vec3<VEC_TYPE> world_pos = vec3<VEC_TYPE>::add
+	vec3<VERTEX_TYPE> world_pos = vec3<VERTEX_TYPE>::add
 	(
-		vec3<VEC_TYPE>::multiply(ray_dir, dist_traveled),
+		vec3<VERTEX_TYPE>::multiply(ray_dir, dist_traveled),
 		ray_origin
 	);
 
@@ -325,7 +336,7 @@ ray_info<VEC_TYPE> ray_intersect_tri(const vec3<float>& ray_origin, const vec3<f
 		{
 			dist_traveled,
 			world_pos,
-			vec2<VEC_TYPE>
+			vec2<VERTEX_TYPE>
 			{
 				intersect_u,
 				intersect_v

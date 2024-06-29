@@ -134,6 +134,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="compile_time_render_settings.h" />
     <ClInclude Include="my_3d_lib.h" />
     <ClInclude Include="renderer.h" />
   </ItemGroup>

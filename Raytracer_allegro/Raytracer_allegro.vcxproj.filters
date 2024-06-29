@@ -32,5 +32,8 @@
     <ClInclude Include="my_3d_lib.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="compile_time_render_settings.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
