@@ -7,12 +7,12 @@
 
 #include "renderer.h"
 
-const int SCREEN_W = 800;
-const int SCREEN_H = 600;
+const int SCREEN_W = 400;
+const int SCREEN_H = 400;
 ALLEGRO_DISPLAY* app_display;
 ALLEGRO_EVENT_QUEUE* event_queue;
 
-Renderer* renderer;
+Renderer renderer;
 
 #define fail(x) {std::cout<<x; exit(-1);}
 void init();
@@ -55,13 +55,13 @@ void init()
 
     al_register_event_source(event_queue, al_get_display_event_source(app_display)); // Register display event source
 
-    al_clear_to_color(al_map_rgb(255, 255, 255));
-
-    renderer = new Renderer(SCREEN_W,SCREEN_H);
+    renderer = Renderer{ SCREEN_W,SCREEN_H };
 }
 
 void tick()
 {
-    renderer->render_frame();
-    //al_flip_display();
+    renderer.render_frame();
+    al_flip_display();
+    renderer.camera.PITCH_YAW.y -= 0.02f;
+    al_clear_to_color(al_map_rgb(0, 0, 0));
 }

@@ -14,7 +14,7 @@ private:
 	Scene<VERTEX_TYPE,NORMAL_TYPE,UV_TYPE> scene;
 public:
 	unsigned short	SCREEN_W, SCREEN_H;
-	Camera* camera;
+	Camera camera;
 
 	//calls compute_color() with the appropriate angle and position for each pixel on the screen
 	void render_frame();
@@ -34,17 +34,19 @@ public:
 		SCREEN_H = screen_height;
 
 		//initialize camera with default values
-		vec3<float> pos;
-		vec2<float> rot(90.0f,0.0f);
-		vec2<unsigned char> fov_xy(DEG_TO_RAD(90), DEG_TO_RAD(90));
+		vec3<float> pos{0.0f,-0.0f,-2.0f};
+		vec2<float> rot(DEG_TO_RAD(0.0f), DEG_TO_RAD(0.0f));
+		vec2<float> fov_xy(DEG_TO_RAD(90.0), DEG_TO_RAD(90.0));
 
-		camera = new Camera(pos,rot,fov_xy);
+		camera = Camera(pos,rot,fov_xy);
 
 		scene.geometry.push_back(Mesh<VERTEX_TYPE,NORMAL_TYPE,UV_TYPE>::get_sample_mesh());
-		scene.geometry.at(0).sort_tris_by_depth(camera->POSITION);
+		scene.geometry.at(0).sort_tris_by_depth(camera.POSITION);
 	}
+	Renderer()
+	{}
 	~Renderer()
 	{
-		delete camera;
+		
 	}
 };
