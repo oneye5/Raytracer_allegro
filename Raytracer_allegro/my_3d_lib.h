@@ -139,35 +139,45 @@ public:
 	}
 	Camera() {}
 };
-
-template<class VERTEX_TYPE,class NORMAL_TYPE, class UV_TYPE>
+template <class COLOR_TYPE>
+struct Material
+{
+	Color<COLOR_TYPE> albedo;
+	float smoothness;
+	float metalic;
+};
+template<class VERTEX_TYPE,class NORMAL_TYPE, class UV_TYPE, class COLOR_TYPE>
 class Mesh 
 {
 public:
+	std::vector<vec3<VERTEX_TYPE>> vertex_buffer;
+	std::vector<vec3<NORMAL_TYPE>> normal_buffer;
+	std::vector<vec2<UV_TYPE>> uv_buffer;
+	std::vector<unsigned int> index_buffer; //in the format of [[vi,n,uv],[vi,n,uv],[vi,n,uv]]
+	Material material;
+
+
 	Mesh(std::vector<vec3<VERTEX_TYPE>> vertex_buffer_,
-		 std::vector<vec3<NORMAL_TYPE>> normal_buffer_, 
-		 std::vector<vec2<UV_TYPE>> uv_buffer_, 
-		 std::vector<unsigned int> index_buffer_)
+		std::vector<vec3<NORMAL_TYPE>> normal_buffer_,
+		std::vector<vec2<UV_TYPE>> uv_buffer_,
+		std::vector<unsigned int> index_buffer_,
+		Material mat)
 	{
 		vertex_buffer = vertex_buffer_;
 		uv_buffer = uv_buffer_;
 		normal_buffer = normal_buffer_;
 		index_buffer = index_buffer_;
+		material = mat;
 	}
 	Mesh() {}
-
-	std::vector<vec3<VERTEX_TYPE>> vertex_buffer;
-	std::vector<vec3<NORMAL_TYPE>> normal_buffer;
-	std::vector<vec2<UV_TYPE>> uv_buffer;
-
-	std::vector<unsigned int> index_buffer; //in the format of [[vi,n,uv],[vi,n,uv],[vi,n,uv]]
 
 	static Mesh get_sample_mesh()
 	{
 		std::vector<vec3<VERTEX_TYPE>> vertex_buffer = {
 			vec3<VERTEX_TYPE>(0.0, 0.0, 1.0), // Bottom-left
 			vec3<VERTEX_TYPE>(0.0, 1.0, 1.0),  // Bottom-right
-			vec3<VERTEX_TYPE>(1.0, 1.0, 1.0)   // Top-right
+			vec3<VERTEX_TYPE>(1.0, 1.0, 1.0),   // Top-right
+			vec3<VERTEX_TYPE>(-1.0, 2.0, 0.2)
 		};
 
 		
@@ -188,9 +198,13 @@ public:
 		{
 			0,0,0,
 			1,1,1,
-			2,2,2
+			2,2,2,
+			0,0,0,
+			1,1,1,
+			3,2,2
 		};
 
+		Material mat{ vec3<COLOR_TYPE>{1,1,1},0.5,0 };
 		return Mesh{ vertex_buffer, normal_buffer, uv_buffer, index_buffer };
 	}
 
@@ -239,6 +253,7 @@ class Scene
 {
 public:
 	std::vector<Mesh<VERTEX_TYPE, NORMAL_TYPE, UV_TYPE>> geometry;
+
 };
 
 /*
