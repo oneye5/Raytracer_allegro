@@ -32,13 +32,17 @@ Color<COLOR_TYPE> Renderer::compute_color(const vec3<VERTEX_TYPE>& position,cons
 	auto info = ray_intersect_scene(position, dir_vector, &hit_mesh);
 	Color<COLOR_TYPE> c(0.0f, 0.0f, 0.0f);
 
-	if(info.hit)
-		c = Color<COLOR_TYPE>(1,1,1);
+	
 
+	if (info.hit)
+	{
+		auto normal = *info.hit_result->HIT_TRIANGLE.normals;
+		c = Color<COLOR_TYPE>(normal->x, normal->y, normal->z);
+	}
 	return c;
 }
 
-ray_info<VERTEX_TYPE> Renderer::ray_intersect_scene(const vec3<float>& ray_origin, const vec3<float> ray_dir, Mesh<VERTEX_TYPE,NORMAL_TYPE,UV_TYPE, COLOR_TYPE>* hit_mesh)
+ray_info<VERTEX_TYPE, NORMAL_TYPE, UV_TYPE> Renderer::ray_intersect_scene(const vec3<float>& ray_origin, const vec3<float> ray_dir, Mesh<VERTEX_TYPE,NORMAL_TYPE,UV_TYPE, COLOR_TYPE>* hit_mesh)
 {
 	for (int i = 0; i < scene.geometry.size(); i++)
 	{

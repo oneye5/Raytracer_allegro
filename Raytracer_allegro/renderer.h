@@ -23,7 +23,7 @@ public:
 	Color<COLOR_TYPE> compute_color(const vec3<float>& position, const vec3<float> dir_vector);
 
 	// uses ray_intersect_tri but iterates over all meshses and triangles in the scene until its deemed unlikley or certain that the ray does not intersect with anything
-	ray_info<VERTEX_TYPE> ray_intersect_scene(const vec3<float>& ray_origin, const vec3<float> ray_dir, Mesh<VERTEX_TYPE, NORMAL_TYPE, UV_TYPE, COLOR_TYPE>* hit_mesh);
+	ray_info<VERTEX_TYPE, NORMAL_TYPE, UV_TYPE> ray_intersect_scene(const vec3<float>& ray_origin, const vec3<float> ray_dir, Mesh<VERTEX_TYPE, NORMAL_TYPE, UV_TYPE, COLOR_TYPE>* hit_mesh);
 
 
 

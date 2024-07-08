@@ -289,24 +289,25 @@ struct triangle_info
 };
 
 // used in ray_info, for avoiding un-needed memory allocation however we must be careful to avoid memory leaks
-template <class VERTEX_TYPE>
+template <class VERTEX_TYPE, class NORMAL_TYPE, class UV_TYPE>
 struct hit_info
 {
 	VERTEX_TYPE DISTANCE;
 	vec3<VERTEX_TYPE> HIT_POINT_WORLDSPACE;
 	vec2<VERTEX_TYPE> HIT_POINT_UVSPACE;
+	triangle_info<VERTEX_TYPE, NORMAL_TYPE, UV_TYPE> HIT_TRIANGLE;
 };
 // returned by ray_intersect_tri()
-template <class VERTEX_TYPE>
+template <class VERTEX_TYPE,class NORMAL_TYPE,class UV_TYPE>
 struct ray_info
 {
 	bool hit;
-	std::unique_ptr<hit_info<VERTEX_TYPE>> hit_result;
+	std::unique_ptr<hit_info<VERTEX_TYPE, NORMAL_TYPE, UV_TYPE>> hit_result;
 };
 
 //checks if a ray intersects with a triangle. (uses the moller trumbore algorithm)
 template <class VERTEX_TYPE, class NORMAL_TYPE, class UV_TYPE>
-ray_info<VERTEX_TYPE> ray_intersect_tri(const vec3<float>& ray_origin, const vec3<float>& ray_dir, const triangle_info<VERTEX_TYPE, UV_TYPE, NORMAL_TYPE>& tri)
+ray_info<VERTEX_TYPE,NORMAL_TYPE, UV_TYPE> ray_intersect_tri(const vec3<float>& ray_origin, const vec3<float>& ray_dir, const triangle_info<VERTEX_TYPE, NORMAL_TYPE, UV_TYPE>& tri)
 {
 	const float moe = 0.000001f;
 
@@ -317,7 +318,7 @@ ray_info<VERTEX_TYPE> ray_intersect_tri(const vec3<float>& ray_origin, const vec
 	VERTEX_TYPE cross_edge_dot = vec3<VERTEX_TYPE>::dot_product(edge_1, dir_edge_cross);
 
 	if (cross_edge_dot > -moe && cross_edge_dot < moe) //ray parallel to triangle plane, it will never intersect so we can return early
-		return ray_info<VERTEX_TYPE>{ false };
+		return ray_info<VERTEX_TYPE,NORMAL_TYPE,UV_TYPE>{ false };
 
 	VERTEX_TYPE inverse_cross_dot = 1.0f / cross_edge_dot;
 	vec3<VERTEX_TYPE> origin_tri_dif = vec3<VERTEX_TYPE>::subtract(ray_origin, *tri.vertices[0]);
@@ -329,13 +330,13 @@ ray_info<VERTEX_TYPE> ray_intersect_tri(const vec3<float>& ray_origin, const vec
 	VERTEX_TYPE dist_traveled = inverse_cross_dot * vec3<VERTEX_TYPE>::dot_product(edge_2, pos_dif_cross);
 
 	if (intersect_u < 0.0 || intersect_u > 1.0)//--------------- point lies outside the bounds along the edge of the first fertex to the seccond, so we can return early
-		return ray_info<VERTEX_TYPE>{ false };
+		return ray_info<VERTEX_TYPE, NORMAL_TYPE, UV_TYPE>{ false };
 
 	if (intersect_v < 0.0 || intersect_u + intersect_v > 1.0)//- point lies outside or past the third edge
-		return ray_info<VERTEX_TYPE>{ false };
+		return ray_info<VERTEX_TYPE, NORMAL_TYPE, UV_TYPE>{ false };
 
 	if (dist_traveled < moe)//---------------------------------- ray does not travel far enough from origin to count as a valid hit
-		return ray_info<VERTEX_TYPE>{ false };
+		return ray_info<VERTEX_TYPE, NORMAL_TYPE, UV_TYPE>{ false };
 
 	// we have a confirmed hit, now lets calculate where exactly this happened in world space
 	vec3<VERTEX_TYPE> world_pos = vec3<VERTEX_TYPE>::add
@@ -344,14 +345,18 @@ ray_info<VERTEX_TYPE> ray_intersect_tri(const vec3<float>& ray_origin, const vec
 		ray_origin
 	);
 
-	return ray_info<VERTEX_TYPE>
+	return ray_info<VERTEX_TYPE, NORMAL_TYPE, UV_TYPE>
 	{
 		true,
-		std::make_unique<hit_info<VERTEX_TYPE>>(hit_info<VERTEX_TYPE>
-		{
-			dist_traveled,
-			world_pos,
-			vec2<VERTEX_TYPE>{ intersect_u, intersect_v }
-		})
+		std::make_unique<hit_info<VERTEX_TYPE,NORMAL_TYPE,UV_TYPE> > 
+			(
+				hit_info<VERTEX_TYPE,NORMAL_TYPE,UV_TYPE> 
+				{
+					dist_traveled,
+					world_pos,
+					vec2<VERTEX_TYPE>{ intersect_u, intersect_v },
+					tri
+				} 
+			)
 	};
 }
