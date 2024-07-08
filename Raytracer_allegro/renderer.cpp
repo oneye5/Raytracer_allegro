@@ -28,7 +28,7 @@ void Renderer::render_frame()
 
 Color<COLOR_TYPE> Renderer::compute_color(const vec3<VERTEX_TYPE>& position,const vec3<float> dir_vector)
 {
-	Mesh<VERTEX_TYPE,NORMAL_TYPE,UV_TYPE> hit_mesh;
+	Mesh<VERTEX_TYPE,NORMAL_TYPE,UV_TYPE, COLOR_TYPE> hit_mesh;
 	auto info = ray_intersect_scene(position, dir_vector, &hit_mesh);
 	Color<COLOR_TYPE> c(0.0f, 0.0f, 0.0f);
 
@@ -38,11 +38,11 @@ Color<COLOR_TYPE> Renderer::compute_color(const vec3<VERTEX_TYPE>& position,cons
 	return c;
 }
 
-ray_info<VERTEX_TYPE> Renderer::ray_intersect_scene(const vec3<float>& ray_origin, const vec3<float> ray_dir, Mesh<VERTEX_TYPE,NORMAL_TYPE,UV_TYPE>* hit_mesh)
+ray_info<VERTEX_TYPE> Renderer::ray_intersect_scene(const vec3<float>& ray_origin, const vec3<float> ray_dir, Mesh<VERTEX_TYPE,NORMAL_TYPE,UV_TYPE, COLOR_TYPE>* hit_mesh)
 {
 	for (int i = 0; i < scene.geometry.size(); i++)
 	{
-		Mesh<VERTEX_TYPE, NORMAL_TYPE, UV_TYPE>& mesh = scene.geometry.at(i);
+		Mesh<VERTEX_TYPE, NORMAL_TYPE, UV_TYPE, COLOR_TYPE>& mesh = scene.geometry.at(i);
 		for (int j = 0; j < mesh.index_buffer.size(); j += 9)
 		{
 			//get pointers to the data that make up the tri, for use by the raycaster

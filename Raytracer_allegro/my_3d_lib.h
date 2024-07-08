@@ -20,6 +20,12 @@ public:
 	{
 		r = red; g = green; b = blue;
 	}
+	Color()
+	{
+		r = 1.0;
+		g = 1.0;
+		b = 1.0;
+	}
 };
 
 template<class T>
@@ -142,9 +148,24 @@ public:
 template <class COLOR_TYPE>
 struct Material
 {
+public: 
 	Color<COLOR_TYPE> albedo;
 	float smoothness;
 	float metalic;
+
+	Material()
+	{
+		albedo = Color<COLOR_TYPE>(0, 1, 0);
+		smoothness = 0.5f;
+		metalic = 0.0f;
+	}
+	Material(Color<COLOR_TYPE> ALBEDO, float SMOOTHNESS = 0.5f, float METALIC = 0.0f)
+	{
+		albedo = ALBEDO;
+		smoothness = SMOOTHNESS;
+		metalic = METALIC;
+	}
+
 };
 template<class VERTEX_TYPE,class NORMAL_TYPE, class UV_TYPE, class COLOR_TYPE>
 class Mesh 
@@ -154,14 +175,14 @@ public:
 	std::vector<vec3<NORMAL_TYPE>> normal_buffer;
 	std::vector<vec2<UV_TYPE>> uv_buffer;
 	std::vector<unsigned int> index_buffer; //in the format of [[vi,n,uv],[vi,n,uv],[vi,n,uv]]
-	Material material;
+	Material<COLOR_TYPE> material;
 
 
 	Mesh(std::vector<vec3<VERTEX_TYPE>> vertex_buffer_,
 		std::vector<vec3<NORMAL_TYPE>> normal_buffer_,
 		std::vector<vec2<UV_TYPE>> uv_buffer_,
 		std::vector<unsigned int> index_buffer_,
-		Material mat)
+		Material<COLOR_TYPE> mat)
 	{
 		vertex_buffer = vertex_buffer_;
 		uv_buffer = uv_buffer_;
@@ -204,8 +225,8 @@ public:
 			3,2,2
 		};
 
-		Material mat{ vec3<COLOR_TYPE>{1,1,1},0.5,0 };
-		return Mesh{ vertex_buffer, normal_buffer, uv_buffer, index_buffer };
+		Material<COLOR_TYPE> mat{ Color<COLOR_TYPE>{1.0f,1.0f,1.0f},0.5f,0.0f };
+		return Mesh { vertex_buffer, normal_buffer, uv_buffer, index_buffer, mat };
 	}
 
 	void sort_tris_by_depth(const vec3<float>& camera_position)
@@ -248,11 +269,11 @@ public:
 	}
 
 };
-template<class VERTEX_TYPE, class NORMAL_TYPE, class UV_TYPE>
+template<class VERTEX_TYPE, class NORMAL_TYPE, class UV_TYPE, class COLOR_TYPE>
 class Scene
 {
 public:
-	std::vector<Mesh<VERTEX_TYPE, NORMAL_TYPE, UV_TYPE>> geometry;
+	std::vector<Mesh<VERTEX_TYPE, NORMAL_TYPE, UV_TYPE, COLOR_TYPE>> geometry;
 
 };
 
